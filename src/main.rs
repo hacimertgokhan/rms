@@ -2,7 +2,7 @@ use actix_web::{web, App, HttpServer, Responder, HttpResponse};
 use mongodb::{Client, options::ClientOptions, bson::doc};
 use serde::{Deserialize, Serialize};
 use std::env;
-use crate::client::account::{check_account, check_user_exists, create_account};
+use crate::client::account::{check_account, check_user_exists, create_account, get_exists_user};
 
 mod cli;
 
@@ -36,6 +36,7 @@ async fn main() -> std::io::Result<()> {
             .app_data(web::Data::new(client.clone()))
             .route("/account/check/{email}", web::get().to(check_account))
             .route("/account/create", web::post().to(create_account))
+            .route("/account/user", web::get().to(get_exists_user))
     })
         .bind("127.0.0.1:8080")?
         .run()

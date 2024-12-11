@@ -2,7 +2,7 @@ use actix_web::{web, HttpResponse, Responder};
 use bcrypt::{hash, DEFAULT_COST};
 use mongodb::bson::doc;
 use mongodb::Client;
-use crate::structs::account::Account;
+use crate::structs::account::{Account, User};
 
 pub async fn check_user_exists(client: &Client, email: &str) -> bool {
     let db = client.database("rms");
@@ -20,6 +20,18 @@ pub async fn check_account(email: web::Path<String>, client: web::Data<Client>) 
         HttpResponse::Ok().json(format!("User with email {} exists.", email))
     } else {
         HttpResponse::NotFound().json(format!("User with email {} not found.", email))
+    }
+}
+pub async fn get_exists_user(user: web::Json<User>, client: web::Data<Client>) -> HttpResponse {
+    let db = client.database("rms");
+    let collection = db.collection::<User>("users");
+    let doc = collection.find_one(doc! { "email": &user.email }).await;
+    match doc {
+        Ok(Some(_)) => HttpResponse::Ok().json(user.into_inner()),
+        Ok(None) => {
+            HttpResponse::Conflict().body("User already exists.")
+        }
+        Err(_) => HttpResponse::InternalServerError().body("Failed to query database."),
     }
 }
 
