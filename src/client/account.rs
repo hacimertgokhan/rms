@@ -2,6 +2,7 @@ use actix_web::{web, HttpResponse, Responder};
 use bcrypt::{hash, DEFAULT_COST};
 use mongodb::bson::doc;
 use mongodb::Client;
+use uuid::Uuid;
 use crate::structs::account::{Account, User};
 
 pub async fn check_user_exists(client: &Client, email: &str) -> bool {
@@ -25,7 +26,7 @@ pub async fn check_account(email: web::Path<String>, client: web::Data<Client>) 
 pub async fn get_exists_user(user: web::Json<User>, client: web::Data<Client>) -> HttpResponse {
     let db = client.database("rms");
     let collection = db.collection::<User>("users");
-    let doc = collection.find_one(doc! { "email": &user.email }).await;
+    let doc = collection.find_one(doc! { "id": &user.email }).await;
     match doc {
         Ok(Some(_)) => HttpResponse::Ok().json(user.into_inner()),
         Ok(None) => {
@@ -48,10 +49,14 @@ pub async fn create_account(user: web::Json<Account>, client: web::Data<Client>)
         Err(_) => return HttpResponse::InternalServerError().body("Failed to hash password"),
     };
 
+    let uuid = Uuid::new_v4();
+
     let user_doc = doc! {
         "email": &user.email,
         "password": hashed_password,
         "username": &user.username,
+        "admin": &user.admin,
+        "id": uuid.to_string(),
     };
 
     match collection.insert_one(user_doc).await {

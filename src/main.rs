@@ -1,10 +1,11 @@
 use actix_web::{web, App, HttpServer, Responder, HttpResponse};
-use mongodb::{Client, options::ClientOptions, bson::doc};
+use mongodb::{Client, options::ClientOptions, bson::doc };
 use serde::{Deserialize, Serialize};
 use std::env;
-use crate::client::account::{check_account, check_user_exists, create_account, get_exists_user};
+use crate::client::account::{check_account, create_account, get_exists_user};
 
 mod cli;
+mod jwt;
 
 mod client {
     pub mod account;
