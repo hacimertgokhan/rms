@@ -1,4 +1,16 @@
 use serde::{Deserialize, Serialize};
+use utoipa::ToSchema;
+
+#[derive(Serialize, Deserialize, utoipa::ToSchema)]
+pub struct AccountRequestByIDRequest {
+    pub(crate) id: String,
+}
+
+#[derive(Serialize, Deserialize, utoipa::ToSchema)]
+pub struct AccountRequestByEmail {
+    pub(crate) email: String,
+}
+
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Claims {
@@ -7,16 +19,16 @@ pub struct Claims {
     pub(crate) exp: usize,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, ToSchema)]
 pub struct Account {
-    pub(crate) email: String,
     pub(crate) id: String,
+    pub(crate) email: String,
     pub(crate) username: String,
     pub(crate) admin: bool,
     pub(crate) password: String,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, ToSchema)]
 pub struct User {
     pub(crate) id: String,
     pub(crate) admin: bool,
