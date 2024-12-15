@@ -58,7 +58,7 @@ async fn main() -> std::io::Result<()> {
         .init();
     let host = "127.0.0.1";
     let port = 8080;
-    info!("🧭 Server started at {}:{}", host, port);
+    info!("🧭 Server started on {}:{}", host, port);
     info!("🚀 Swagger UI is available at: http://{}:{}/swagger-ui/index.html", host, port);
     info!("📚 OpenAPI Documentation available at: http://{}:{}/api-docs/openapi.json", host, port);
 

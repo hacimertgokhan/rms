@@ -17,7 +17,7 @@ pub async fn check_user_exists(client: &Client, email: &str) -> bool {
 }
 
 #[utoipa::path(
-    post,
+    get,
     tag = "Accounts",
     path = "/account/check/{email}",
     request_body = AccountRequestByEmail,
