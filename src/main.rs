@@ -1,3 +1,6 @@
+use crate::structs::sections::Sections;
+use crate::sectionizer::sections::__path_get_section_by_id;
+use crate::sectionizer::sections::__path_create_section;
 use crate::structs::account::Account;
 use crate::client::account::__path_check_account;
 use crate::client::account::__path_get_exists_user;
@@ -11,6 +14,8 @@ use utoipa_swagger_ui::{oauth, Config, SwaggerUi};
 use log::{info, LevelFilter};
 use env_logger::Builder;
 use crate::client::account::{check_account, create_account, get_exists_user};
+use crate::sectionizer::sections::{create_section, get_section_by_id};
+
 mod cli;
 mod jwt;
 
@@ -24,6 +29,7 @@ mod sectionizer {
 
 mod structs {
     pub mod account;
+    pub mod sections;
 }
 
 async fn connect_to_mongo() -> mongodb::error::Result<Client> {
@@ -40,11 +46,16 @@ async fn connect_to_mongo() -> mongodb::error::Result<Client> {
 #[openapi(paths(
     create_account,
     get_exists_user,
-    check_account),
-    components(schemas(Account)),
+    check_account,
+    create_section,
+    get_section_by_id),
+    components(
+        schemas(Account),
+        schemas(Sections)
+    ),
     tags(
         (name = "Accounts", description = "Account management endpoints"),
-        (name = "Sectionizer", description = "Sectionizer management endpoints")
+        (name = "Sections", description = "Sectionizer management endpoints")
     )
 )]
 struct ApiDoc;
@@ -75,6 +86,8 @@ async fn main() -> std::io::Result<()> {
             .route("/account/check/{email}", web::get().to(check_account))
             .route("/account/create", web::post().to(create_account))
             .route("/account/user", web::get().to(get_exists_user))
+            .route("/sections/get/{id}", web::get().to(get_section_by_id))
+            .route("/sections/create", web::get().to(create_section))
             .service(swagger.clone())
     })
         .bind((host, port))?
